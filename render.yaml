@@ -1,23 +1,21 @@
-databases:
-  - name: northlijn-db
-    plan: starter
-    databaseName: northlijn
-    user: northlijn
-
 services:
   - type: web
     name: northlijn-server
     runtime: python
-    plan: starter
+    plan: free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.7
+      # No Render-managed database here — Render's free Postgres tier
+      # auto-deletes after 30 days, which isn't acceptable even for a
+      # hobby project's real data. Use a free Neon (or Supabase) Postgres
+      # instead and paste its connection string here manually in Render's
+      # dashboard. `sync: false` means Render won't try to auto-fill this
+      # and will prompt for it instead.
       - key: DATABASE_URL
-        fromDatabase:
-          name: northlijn-db
-          property: connectionString
+        sync: false
       # Render generates and stores this itself — it's never typed or
       # displayed anywhere, including here.
       - key: JWT_SECRET_KEY
